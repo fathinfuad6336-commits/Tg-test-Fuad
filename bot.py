@@ -7,14 +7,13 @@ API_ID = 26288557
 API_HASH = 'f2c5cc7974b87a2ee5ee229b88dd20e5'  
 BOT_TOKEN ='8770799697:AAGFv7Kk-amCAeIvCPnCsoXgDEdq3q04udE'
 
-bot = TelegramClient('bot_session', API_ID, API_HASH)
+bot = TelegramClient('bot_session_v2', API_ID, API_HASH)
 
 user_states = {}
 
 def get_sessions():
     """সব সেভ হওয়া সেশন ফাইল বের করার ফাংশন"""
-    return [f for f in os.listdir('.') if f.endswith('.session') and f != 'bot_session.session']
-
+    return [f for f in os.listdir('.') if f.endswith('.session') and f != 'bot_session_v2.session']
 @bot.on(events.NewMessage(pattern='/start'))
 async def start(event):
     first_name = event.sender.first_name if event.sender else "User"
