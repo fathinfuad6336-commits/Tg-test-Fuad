@@ -1,19 +1,27 @@
 import asyncio
 import os
 from telethon import TelegramClient, events
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
 
-# --- আপনার Credentials ---
+# --- ডামি HTTP সার্ভার (Render Port Error দূর করতে) ---
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is active!")
+
+def run_http_server():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(('0.0.0.0', port), DummyHandler)
+    server.serve_forever()
+
+# --- Credentials ---
 API_ID = 26288557
 API_HASH = 'f2c5cc7974b87a2ee5ee229b88dd20e5'
 BOT_TOKEN = '8770799697:AAGPVMyZZSyVr4XVxDuCzzlm7164oAqGrM0'
 
 bot = TelegramClient('bot_session_v2', API_ID, API_HASH)
-
-user_states = {}
-
-def get_sessions():
-    """সব সেভ হওয়া সেশন ফাইল বের করার ফাংশন"""
-    return [f for f in os.listdir('.') if f.endswith('.session')]
 
 @bot.on(events.NewMessage(pattern='/start'))
 async def start(event):
@@ -29,7 +37,7 @@ async def start(event):
     await event.respond(msg)
 
 async def main():
-    # bot_token দিয়ে সার্ভিস স্টার্ট করা হচ্ছে
+    threading.Thread(target=run_http_server, daemon=True).start()
     await bot.start(bot_token=BOT_TOKEN)
     print("Bot is running...")
     await bot.run_until_disconnected()
